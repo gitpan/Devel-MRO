@@ -3,12 +3,14 @@ package Devel::MRO;
 use 5.008_001;
 use strict;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # all features in mro_compat.h
 
 1;
 __END__
+
+=for stopwords mro gfx API pre
 
 =head1 NAME
 
@@ -16,7 +18,7 @@ Devel::MRO - Provides mro functions for XS modules
 
 =head1 VERSION
 
-This document descrives Devel::MRO version 0.02.
+This document describes Devel::MRO version 0.03.
 
 =head1 SYNOPSIS
 

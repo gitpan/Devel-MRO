@@ -22,7 +22,7 @@ $pkg->save_config('xsdepends/Files.pm');
 tests 't/*.t';
 author_tests 'xt';
 
-no_index 'example';
+no_index directory => 'example';
 
 WriteMakefile(
 	$pkg->get_makefile_vars,

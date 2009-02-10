@@ -1,5 +1,8 @@
 Revision history for Perl extension Devel::MRO
 
+0.03 Tue Feb 10 13:06:36 2009
+	- re-packaging
+
 0.02 Tue Feb 10 12:33:02 2009
 	- ** The module interface has been changed **
 		- mro_compat.h is installed as a library
