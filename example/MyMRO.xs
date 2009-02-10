@@ -6,11 +6,15 @@
 #include "ppport.h"
 
 #define NEED_mro_get_linear_isa
-#include "lib/Devel/MRO/mro_compat.h"
+#include "mro_compat.h"
 
 typedef HV STASH;
 
-MODULE = Devel::MRO PACKAGE = Devel::MRO
+/* these mro_* functions are only for tests */
+
+MODULE = MyMRO		PACKAGE = MyMRO
+
+PROTOTYPES: DISABLE
 
 AV*
 mro_get_linear_isa(package)
@@ -23,3 +27,4 @@ mro_get_pkg_gen(package)
 void
 mro_method_changed_in(package)
 	STASH* package
+

@@ -2,119 +2,46 @@ package Devel::MRO;
 
 use 5.008_001;
 use strict;
-use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
-use Exporter qw(import);
-use File::Basename qw(dirname basename);
-use File::Spec;
+# all features in mro_compat.h
 
-our @EXPORT      = qw(WriteMRO);
-our @EXPORT_FAIL = qw(mro_get_linear_isa mro_get_pkg_gen mro_method_changed_in);
-
-our @EXPORT_OK   = (@EXPORT, @EXPORT_FAIL);
-
-our %EXPORT_TAGS = (test => \@EXPORT_FAIL);
-
-sub export_fail{
-	require XSLoader;
-	XSLoader::load(__PACKAGE__, $VERSION);
-	return ();
-}
-
-my $NAME = 'mro_compat';
-
-sub WriteMRO{
-	my($name) = @_;
-	$name ||= $NAME;
-
-	my $dir = dirname(__FILE__);
-
-	my $h = File::Spec->join($dir, 'MRO', $NAME . '.h');
-
-	my $h_to = $name . '.h';
-
-	_copy($h => $h_to);
-}
-
-sub _signeture{
-	my($name) = @_;
-
-	my $perlver = sprintf '%vd', $^V;
-	my $signeture = <<"END";
-----------------------------------------------------------------------------
-
-    $name - Provides mro functions for XS
-
-    Automatically created by Devel::MRO/$VERSION, running under perl $perlver
-
-    Copyright (c) 2008, Goro Fuji <gfuji(at)cpan.org>.
-
-    This program is free software; you can redistribute it and/or
-    modify it under the same terms as Perl itself.
-
-----------------------------------------------------------------------------
-
-Usage:
-	#include "$name"
-
-Functions:
-	AV*  mro_get_linear_isa(HV* stash)
-	UV   mro_get_pkg_gen(HV* stash)
-	void mro_method_changed_in(HV* stash)
-
-
-    See "perldoc mro" for details.
-
-END
-}
-
-sub _copy{
-	my($from, $to) = @_;
-
-	print STDERR "creating $to ... ";
-
-	open my $in, '<', $from or die "Cannot open $from for reading: $!";
-	open my $out, '>', $to  or die "Cannot open $to for writing: $!";
-
-	while(<$in>){
-		s/ % SIGNETURE % /_signeture(basename($from)) /xmse;
-		print $out $_;
-	}
-
-	close $in  or die "Cannot close $from opened for reading: $!";
-	close $out or die "Cannot close $to opened for writing: $!";
-
-	print STDERR "OK\n";
-}
 1;
 __END__
 
 =head1 NAME
 
-Devel::MRO - Provides mro functions for XS, creating mro_compat.h
+Devel::MRO - Provides mro functions for XS modules
 
 =head1 VERSION
 
-This document descrives Devel::MRO version 0.01.
+This document descrives Devel::MRO version 0.02.
 
 =head1 SYNOPSIS
 
 	# In your XS distribution
-	# This makes mro_compat.h in the current directory
-	$ perl -MDevel::MRO -e WriteMRO
 
-	# And add the following to your Makefile.PL
+	# Add the following to your Makefile.PL
 	use inc::Module::Install;
+	use ExtUtils::Depends;
 	# ...
 	requires 'MRO::Compat' if $] < 5.010_000;
+
+	my $pkg = ExtUtils::Depends->new('Your::Module', 'Devel::MRO');
+	# ...
+
+	WriteMakefile(
+		$pkg->get_makefile_vars,
+		# ...
+	);
 
 	/* Then put the "include" directive in your Module.xs */
 
 	/* ... */
 	#include "ppport.h"
-	#define NEED_mro_get_linear_isa
+
+	#define NEED_mro_get_linear_isa /* or NEED_mro_get_linear_isa_GLOBAL */
 	#include "mro_compat.h"
 
 	/* Now you can use several mro functions in your Module.xs:
@@ -125,19 +52,27 @@ This document descrives Devel::MRO version 0.01.
 
 =head1 DESCRIPTION
 
-C<Devel::MRO> provides several mro functions for XS.
+C<Devel::MRO> provides several mro functions for XS modules.
 
-=head1 Creating source files
-
-=head2 WriteMRO([name])
+This module provides only a header file, B<mro_compat.h>, so you need not load
+it in your modules.
 
 =head1 XS interface
 
 =head2 AV* mro_get_linear_isa(HV* stash)
 
-=head2 U32 mro_get_pkg_gen(HV* stash)
+The same as C<mro::get_linear_isa()> in Perl.
+
+In 5.10 or later, it is a public C API provided by perl.
+In pre-5.10 it calls C<mro::get_linear_isa> provided by C<MRO::Compat>.
 
 =head2 void mro_method_changed_in(HV* stash)
+
+The same as C<mro::method_changed_in()> in Perl.
+
+=head2 U32 mro_get_pkg_gen(HV* stash)
+
+The same as C<mro::get_pkg_gen()> in Perl.
 
 =head1 DEPENDENCIES
 
@@ -159,12 +94,11 @@ L<mro>.
 
 L<MRO::Compat>.
 
-L<Devel::PPPort>.
+L<perlapi/"MRO Functions">.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2008, Goro Fuji E<lt>gfuji(at)cpan.orgE<gt>
-. Some rights reserved.
+Copyright (c) 2008-2009, Goro Fuji (gfx). Some rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

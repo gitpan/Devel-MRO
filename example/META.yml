@@ -1,9 +1,8 @@
 ---
-abstract: 'Provides mro functions for XS modules'
+abstract: ~
 author:
-  - 'Goro Fuji(gfx) <gfuji(at)cpan.org>.'
+  - 'Goro Fuji'
 build_requires:
-  ExtUtils::Depends: 0
   Test::More: 0.62
 configure_requires:
   ExtUtils::MakeMaker: 6.44
@@ -13,14 +12,14 @@ license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
-name: Devel-MRO
+name: MyMRO
 no_index:
   directory:
     - inc
     - t
-  example: []
 requires:
+  ExtUtils::Depends: 0
   perl: 5.8.1
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.02
+version: 0.01_01
