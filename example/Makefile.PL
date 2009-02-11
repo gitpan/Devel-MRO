@@ -1,3 +1,4 @@
+
 use strict;
 use warnings;
 use inc::Module::Install;
@@ -16,8 +17,10 @@ requires 'ExtUtils::Depends';
 build_requires 'Test::More' => 0.62;
 
 my $pkg = ExtUtils::Depends->new('MyMRO', 'Devel::MRO');
+$pkg->set_inc('-I..');
 
 tests 't/*.t';
+
 
 WriteMakefile(
 	$pkg->get_makefile_vars,

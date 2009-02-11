@@ -1,10 +1,18 @@
 #!perl -w
 
 use strict;
-use Test::More tests => 18;
+use Test::More tests => 19;
 
-use MyMRO;
-BEGIN{ require MRO::Compat if $] < 5.010 } # for "use mro 'c3'"
+BEGIN{
+	package Devel::MRO;
+	use XSLoader;
+	XSLoader::load(__PACKAGE__);
+
+	use Exporter;
+	our @ISA    = qw(Exporter);
+	our @EXPORT = qw(mro_get_linear_isa mro_method_changed_in mro_get_pkg_gen);
+}
+use Devel::MRO;
 
 {
 	package A;
@@ -16,12 +24,10 @@ BEGIN{ require MRO::Compat if $] < 5.010 } # for "use mro 'c3'"
 	our @ISA = qw(B C);
 
 	package E;
-	use mro 'c3';
 	our @ISA = qw(B C);
 
 	package F;
-	use mro 'dfs';
-	our @ISA = qw(B C);
+	our @ISA = qw(E);
 }
 
 foreach my $class (qw(A B C D E F)){
@@ -30,3 +36,6 @@ foreach my $class (qw(A B C D E F)){
 
 	ok eval{ mro_method_changed_in($class); 1 }, 'mro_method_changed_in';# How to test this behavior?
 }
+
+@F::ISA = qw(A);
+is_deeply mro_get_linear_isa('F'), [qw(F A)], 'after @ISA changed';

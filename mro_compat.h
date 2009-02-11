@@ -53,13 +53,17 @@ extern AV* my_mro_get_linear_isa(pTHX_ HV* const stash);
 /* call &mro::get_linear_isa, which is actually &MRO::Compat::__get_linear_isa */
 AV*
 my_mro_get_linear_isa(pTHX_ HV* const stash){
-	GV* const cachegv = *(GV**)hv_fetchs(stash, ISA_CACHE, TRUE);
-	AV* isa;
-	SV* gen;
+	GV* cachegv;
+	AV* isa;  /* linearized ISA cache */
+	SV* gen;  /* package generation */
 	CV* get_linear_isa;
 
+	assert(stash != NULL);
+	assert(SvTYPE(stash) == SVt_PVHV);
+
+	cachegv = *(GV**)hv_fetchs(stash, ISA_CACHE, TRUE);
 	if(!isGV(cachegv))
-		gv_init(cachegv, stash, ISA_CACHE, sizeof(ISA_CACHE)-1, TRUE);
+		gv_init(cachegv, stash, ISA_CACHE, sizeof(ISA_CACHE)-1, GV_ADD);
 
 	isa = GvAVn(cachegv);
 #ifdef GvSVn
@@ -111,14 +115,14 @@ my_mro_get_linear_isa(pTHX_ HV* const stash){
 			I32 i;
 
 			for(i = 0; i < len; i++){
-				HV* const stash = gv_stashsv(AvARRAY(av)[i], FALSE);
-				if(stash)
-					av_push(isa, newSVpv(HvNAME(stash), 0));
+				HV* const st = gv_stashsv(AvARRAY(av)[i], FALSE);
+				if(st)
+					av_push(isa, newSVpv(HvNAME(st), 0));
 			}
 			SvREADONLY_on(isa);
 		}
 		else{
-			Perl_croak(aTHX_ "mro::get_linear_isa() didn't return an ARRAY reference");
+			Perl_croak(aTHX_ "panic: mro::get_linear_isa() didn't return an ARRAY reference");
 		}
 
 		FREETMPS;

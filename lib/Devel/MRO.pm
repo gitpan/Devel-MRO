@@ -3,7 +3,7 @@ package Devel::MRO;
 use 5.008_001;
 use strict;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # all features in mro_compat.h
 
@@ -18,7 +18,7 @@ Devel::MRO - Provides mro functions for XS modules
 
 =head1 VERSION
 
-This document describes Devel::MRO version 0.03.
+This document describes Devel::MRO version 0.04.
 
 =head1 SYNOPSIS
 
@@ -65,8 +65,11 @@ it in your modules.
 
 The same as C<mro::get_linear_isa()> in Perl.
 
-In 5.10 or later, it is a public C API provided by perl.
-In pre-5.10 it calls C<mro::get_linear_isa> provided by C<MRO::Compat>.
+In 5.10 or later, it is just a public Perl API.
+
+In pre-5.10 it calls C<mro::get_linear_isa> provided by C<MRO::Compat>. It has a
+cache mechanism as Perl 5.10 does, so it is much faster than the direct call of
+C<MRO::Compat>'s C<mro::get_linear_isa>.
 
 =head2 void mro_method_changed_in(HV* stash)
 
@@ -74,11 +77,17 @@ The same as C<mro::method_changed_in()> in Perl.
 
 =head2 U32 mro_get_pkg_gen(HV* stash)
 
-The same as C<mro::get_pkg_gen()> in Perl.
+The same as C<mro::get_pkg_gen()> in Perl. This is not a Perl API.
+
+This may evaluate I<stash> more than once.
 
 =head1 DEPENDENCIES
 
 Perl 5.8.1 or later.
+
+ExtUtils::Depends.
+
+MRO::Compat if Perl version < 5.10.0.
 
 =head1 BUGS
 
