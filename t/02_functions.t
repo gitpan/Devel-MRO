@@ -14,6 +14,8 @@ BEGIN{
 }
 use Devel::MRO;
 
+require mro if $] >= 5.011_000;
+
 {
 	package A;
 	package B;

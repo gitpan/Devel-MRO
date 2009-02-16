@@ -3,7 +3,7 @@ package Devel::MRO;
 use 5.008_001;
 use strict;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 # all features in mro_compat.h
 
@@ -18,7 +18,7 @@ Devel::MRO - Provides mro functions for XS modules
 
 =head1 VERSION
 
-This document describes Devel::MRO version 0.04.
+This document describes Devel::MRO version 0.05.
 
 =head1 SYNOPSIS
 
@@ -30,6 +30,7 @@ This document describes Devel::MRO version 0.04.
 	# ...
 	requires 'MRO::Compat' if $] < 5.010_000;
 
+	include 'ExtUtils::Depends';
 	my $pkg = ExtUtils::Depends->new('Your::Module', 'Devel::MRO');
 	# ...
 

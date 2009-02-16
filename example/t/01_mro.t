@@ -4,7 +4,10 @@ use strict;
 use Test::More tests => 18;
 
 use MyMRO;
-BEGIN{ require MRO::Compat if $] < 5.010 } # for "use mro 'c3'"
+BEGIN{
+	require MRO::Compat if $] < 5.010;
+}
+use mro ();
 
 {
 	package A;

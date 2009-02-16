@@ -1,16 +1,14 @@
 use strict;
 use warnings;
 use inc::Module::Install;
-
-require ExtUtils::Depends;
-include 'ExtUtils::Depends';
+use ExtUtils::Depends;
 
 name 'Devel-MRO';
 all_from 'lib/Devel/MRO.pm';
 
-requires 'ExtUtils::Depends';
+build_requires 'ExtUtils::Depends';
 
-test_requires 'Test::More' => 0.62;
+build_requires 'Test::More' => 0.62;
 
 my $pkg = ExtUtils::Depends->new('Devel::MRO');
 
@@ -31,6 +29,8 @@ author_tests 'xt';
 
 no_index directory => 'example';
 no_index directory => 'benchmark';
+
+include 'ExtUtils::Depends';
 
 WriteMakefile(
 	$pkg->get_makefile_vars,
